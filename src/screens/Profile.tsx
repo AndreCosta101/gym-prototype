@@ -1,6 +1,6 @@
 import { VStack, ScrollView, Center, Skeleton, Text, Heading} from 'native-base';
 import { useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity  } from 'react-native';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { UserPhoto } from '../components/UserPhoto';
 import { Input } from '../components/Input';
@@ -13,7 +13,9 @@ export function Profile(){
     return (
         <VStack flex={1}>
             <ScreenHeader title="Perfil"/>
-            <ScrollView>
+
+            
+            <ScrollView contentContainerStyle={{paddingBottom: 300}}>
                 <Center mt={6} px={10}>
                     { photoIsLoaded ? 
                     <Skeleton 
@@ -76,6 +78,7 @@ export function Profile(){
                     />
                 </Center>
             </ScrollView>
+            
         </VStack>
     )
 }

@@ -5,9 +5,9 @@ import { Entypo } from '@expo/vector-icons';
 
 type Props = TouchableOpacityProps & {};
 
-export function ExerciseCard({...rest}: Props){
+export function ExerciseCard({onPress, ...rest}: Props){
     return (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={onPress}>
             <HStack bg='gray.500' alignItems='center' p={2} pr={4} rounded='md' mb={3}>
                 <Image
                     source={{ uri: 'http://conteudo.imguol.com.br/c/entretenimento/0c/2019/12/03/remada-unilateral-com-halteres-1575402100538_v2_600x600.jpg' }}

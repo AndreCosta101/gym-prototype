@@ -1,6 +1,6 @@
 import { VStack, ScrollView, Center, Skeleton, Text, Heading} from 'native-base';
 import { useState } from 'react';
-import { TouchableOpacity  } from 'react-native';
+import { TouchableOpacity, KeyboardAvoidingView  } from 'react-native';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { UserPhoto } from '../components/UserPhoto';
 import { Input } from '../components/Input';
@@ -48,7 +48,7 @@ export function Profile(){
                         placeholder='E-mail'
                         isDisabled
                     />
-
+                
                     <Heading color='gray.200' fontSize="md" mb={2} alignSelf='flex-start' mt={12}>
                         Alterar Senha
                     </Heading>
@@ -76,6 +76,7 @@ export function Profile(){
                         mt={4}
 
                     />
+                    
                 </Center>
             </ScrollView>
             

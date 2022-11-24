@@ -1,4 +1,4 @@
-import { VStack, ScrollView, Center, Skeleton, Text, Heading} from 'native-base';
+import { VStack, ScrollView, Center, Skeleton, Text, Heading, useToast} from 'native-base';
 import { useState } from 'react';
 import { Alert, TouchableOpacity  } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -14,6 +14,7 @@ const PHOTO_SIZE = 33;
 export function Profile(){
     const [photoIsLoading, setPhotoIsLoading] = useState(false);
     const [userPhoto, setUserPhoto] = useState('https://github.com/andrecosta101.png');
+    const toast = useToast();
 
     async function handleSelectUserPhoto(){
         setPhotoIsLoading(true);
@@ -33,9 +34,12 @@ export function Profile(){
                 const photoInfo = await FileSystem.getInfoAsync(selectedPhoto.assets[0].uri);
                 
                 if(photoInfo.size &&(photoInfo.size / 1024 / 1024) > 5){
-                    return Alert.alert('Essa imagem é muito grande, selecione uma imagem menor que 5MB');
+                    return toast.show({
+                        title: 'Essa imagem é muito grande, selecione uma imagem menor que 5MB',
+                        placement: 'top',
+                        bgColor: 'red.500'
+                    })
                 }
-
                 setUserPhoto(selectedPhoto.assets[0].uri);
             }
         } catch (error) {

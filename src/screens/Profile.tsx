@@ -1,7 +1,8 @@
 import { VStack, ScrollView, Center, Skeleton, Text, Heading} from 'native-base';
 import { useState } from 'react';
-import { TouchableOpacity  } from 'react-native';
+import { Alert, TouchableOpacity  } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 import { ScreenHeader } from '../components/ScreenHeader';
 import { UserPhoto } from '../components/UserPhoto';
@@ -11,11 +12,38 @@ import { Button } from '../components/Button';
 const PHOTO_SIZE = 33;
 
 export function Profile(){
-    const [photoIsLoaded, setPhotoIsLoaded] = useState(false);
+    const [photoIsLoading, setPhotoIsLoading] = useState(false);
+    const [userPhoto, setUserPhoto] = useState('https://github.com/andrecosta101.png');
 
     async function handleSelectUserPhoto(){
-        // await ImagePicker.requestMediaLibraryPermissionsAsync();
-        await ImagePicker.launchImageLibraryAsync();
+        setPhotoIsLoading(true);
+        try {
+            const selectedPhoto  = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                quality: 1,
+                aspect: [4, 4],
+                allowsEditing: true
+            });
+    
+            if(selectedPhoto.canceled){
+                return;
+            }
+    
+           if(selectedPhoto.assets[0].uri){
+                const photoInfo = await FileSystem.getInfoAsync(selectedPhoto.assets[0].uri);
+                
+                if(photoInfo.size &&(photoInfo.size / 1024 / 1024) > 5){
+                    return Alert.alert('Essa imagem é muito grande, selecione uma imagem menor que 5MB');
+                }
+
+                setUserPhoto(selectedPhoto.assets[0].uri);
+            }
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setPhotoIsLoading(false);
+        }
+
     }
 
 
@@ -26,7 +54,7 @@ export function Profile(){
             
             <ScrollView contentContainerStyle={{paddingBottom: 300}}>
                 <Center mt={6} px={10}>
-                    { photoIsLoaded ? 
+                    { photoIsLoading ? 
                     <Skeleton 
                         w={PHOTO_SIZE} 
                         h={PHOTO_SIZE} 
@@ -36,7 +64,7 @@ export function Profile(){
                     />
                     :
                     <UserPhoto 
-                        source={{uri: 'https://github.com/andrecosta101.png'}}
+                        source={{uri: userPhoto}}
                         alt="Foto de perfil"
                         size={PHOTO_SIZE}
                     />}

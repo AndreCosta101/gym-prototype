@@ -15,6 +15,8 @@ import { api } from '../services/api';
 import { Input } from '../components/Input';    
 import { Button } from '../components/Button';
 import { AppError } from '../utils/AppError';
+import { useState } from 'react';
+import { useAuth } from '../hooks/useAuth';
 
 type FormDataProps = {
     name: string;
@@ -26,13 +28,14 @@ type FormDataProps = {
 const signUpSchema = yup.object({
     name: yup.string().required('Nome é obrigatório'),
     email: yup.string().required('E-mail é obrigatório').email('E-mail inválido'),
-    password: yup.string().required('Senha é obrigatória').min(8, 'No mínimo 8 caracteres'),
+    password: yup.string().required('Senha é obrigatória').min(1, 'No mínimo 8 caracteres'),
     password_confirmation: yup.string().required('Confirme a senha').oneOf([yup.ref('password'), null], 'As senhas precisam ser iguais')
 })
 
 export function SignUp(){
-
+    const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
+    const { signIn } = useAuth();
 
     const navigation = useNavigation();
 
@@ -47,14 +50,13 @@ export function SignUp(){
     async function handleSignUp({name, email, password}: FormDataProps){
 
         try {
-            const response = await api.post('/users', {
-                name,
-                email,
-                password
-            });
+            setIsLoading(true);
 
-            console.log(response.data);
+            await api.post('/users', {name, email, password});
+            await signIn(email, password);
+        
         } catch (error) {
+            setIsLoading(false)
             const isAppError = error instanceof AppError; 
             const title = isAppError ? error.message : 'Erro no servidor.Não foi possível cadastrar';
             
@@ -161,6 +163,7 @@ export function SignUp(){
                     <Button 
                         title='Criar e acessar'
                         onPress={handleSubmit(handleSignUp)}
+                        isLoading={isLoading}
                     />
                 </Center>
 

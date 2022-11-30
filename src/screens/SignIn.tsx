@@ -1,5 +1,5 @@
+import { useState } from "react";
 import { VStack, Image, Text, Center, Heading, ScrollView, useToast} from 'native-base';
-
 import { AuthNavigatorRoutesProps} from '../routes/auth.routes';
 import LogoSvg from '../assets/logo.svg';
 import BackGroundImg from '../assets/background.png'
@@ -18,7 +18,7 @@ type FormData = {
 }
 
 export function SignIn(){
-
+    const [loading, setIsLoading] = useState(false);
     const { signIn } = useAuth();
     const navigation = useNavigation<AuthNavigatorRoutesProps>();
     const toast = useToast();
@@ -31,10 +31,14 @@ export function SignIn(){
 
     async function handleSignIn({email, password}: FormData){
         try {
+            setIsLoading(true);
             await signIn(email, password);
         } catch (error) {
             const isAppError = error instanceof AppError;
             const title = isAppError ? error.message : 'Erro no servidor. Não foi possível fazer login';
+            
+            setIsLoading(false);
+
             toast.show({
                 title,
                 placement: 'top',
@@ -102,6 +106,7 @@ export function SignIn(){
                     <Button 
                         title='Acessar'
                         onPress={handleSubmit(handleSignIn)}
+                        isLoading={loading}
                     />
                 </Center>
 

@@ -1,19 +1,46 @@
-import { VStack, Image, Text, Center, Heading, ScrollView} from 'native-base';
+import { VStack, Image, Text, Center, Heading, ScrollView, useToast} from 'native-base';
 
 import { AuthNavigatorRoutesProps} from '../routes/auth.routes';
 import LogoSvg from '../assets/logo.svg';
 import BackGroundImg from '../assets/background.png'
+import { useAuth } from '../hooks/useAuth';
 
 import { Input } from '../components/Input';    
 import { Button } from '../components/Button';
 import { useNavigation } from '@react-navigation/native';
+import { AppError } from '../utils/AppError';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+
+type FormData = {
+    email: string;
+    password: string;
+}
 
 export function SignIn(){
 
+    const { signIn } = useAuth();
     const navigation = useNavigation<AuthNavigatorRoutesProps>();
+    const toast = useToast();
+
+    const { control, handleSubmit, formState: { errors } } = useForm<FormData>()
 
     function handleNewAccount(){
         navigation.navigate('signUp');
+    }
+
+    async function handleSignIn({email, password}: FormData){
+        try {
+            await signIn(email, password);
+        } catch (error) {
+            const isAppError = error instanceof AppError;
+            const title = isAppError ? error.message : 'Erro no servidor. Não foi possível fazer login';
+            toast.show({
+                title,
+                placement: 'top',
+                bgColor: 'red.500'
+            })
+        }
     }
 
 
@@ -43,18 +70,39 @@ export function SignIn(){
                         Acesse sua conta
                     </Heading>
 
+                <Controller 
+                    control={control}
+                    name="email"
+                    rules={{ required: 'Informe o e-mail' }}
+                    render={({ field: { onChange } }) => (
                     <Input 
-                        placeholder='Email'
-                        keyboardType='email-address'
-                        autoCapitalize='none'
+                        placeholder="E-mail" 
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        onChangeText={onChange}
+                        errorMessage={errors.email?.message}
                     />
-
+                    )}
+                />
+          
+                <Controller 
+                    control={control}
+                    name="password"
+                    rules={{ required: 'Informe a senha' }}
+                    render={({ field: { onChange } }) => (
                     <Input 
-                        placeholder='Senha'
+                        placeholder="Senha" 
                         secureTextEntry
+                        onChangeText={onChange}
+                        errorMessage={errors.password?.message}
                     />
+                    )}
+                />
 
-                    <Button title='Acessar'/>
+                    <Button 
+                        title='Acessar'
+                        onPress={handleSubmit(handleSignIn)}
+                    />
                 </Center>
 
                 <Center mt={24}>

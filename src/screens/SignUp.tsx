@@ -1,4 +1,4 @@
-import { VStack, Image, Text, Center, Heading, ScrollView} from 'native-base';
+import { VStack, Image, Text, Center, Heading, ScrollView, useToast} from 'native-base';
 
 import LogoSvg from '../assets/logo.svg';
 import { useForm, Controller } from 'react-hook-form';
@@ -9,8 +9,12 @@ import BackGroundImg from '../assets/background.png'
 import { useNavigation } from '@react-navigation/native';
 import * as yup from 'yup';
 
+import axios from 'axios';
+import { api } from '../services/api';
+
 import { Input } from '../components/Input';    
 import { Button } from '../components/Button';
+import { AppError } from '../utils/AppError';
 
 type FormDataProps = {
     name: string;
@@ -28,6 +32,8 @@ const signUpSchema = yup.object({
 
 export function SignUp(){
 
+    const toast = useToast();
+
     const navigation = useNavigation();
 
     const { control, handleSubmit, formState: {errors} } = useForm<FormDataProps>({
@@ -39,17 +45,29 @@ export function SignUp(){
     }
 
     async function handleSignUp({name, email, password}: FormDataProps){
-        const response = await fetch('http://192.168.15.200:3333/users', {
-            method: 'POST',
-            headers: {  
-                'Accept': 'application/json',    
-                'Content-Type': 'application/json'  
-            },
-            body: JSON.stringify({name, email, password})
-        })
 
-        const data = await response.json();
-        console.log(data);
+        try {
+            const response = await api.post('/users', {
+                name,
+                email,
+                password
+            });
+
+            console.log(response.data);
+        } catch (error) {
+            const isAppError = error instanceof AppError; 
+            const title = isAppError ? error.message : 'Erro no servidor.Não foi possível cadastrar';
+            
+            toast.show({
+                title,
+                placement: 'top',
+                bgColor: 'red.500'
+
+            })
+        }
+        
+
+        
         
     }
 

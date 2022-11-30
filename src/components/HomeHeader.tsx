@@ -7,7 +7,7 @@ import { TouchableOpacity } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 
 export function HomeHeader(){
-    const {user} = useAuth();
+    const {user, signOut} = useAuth();
     
 
     return (
@@ -28,7 +28,7 @@ export function HomeHeader(){
                 </Heading>
             </VStack>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={signOut}>
                 <Icon 
                     as={MaterialIcons}
                     name='logout'

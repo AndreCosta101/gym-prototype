@@ -11,3 +11,7 @@ export async function getUserStorage() {
   const user = await AsyncStorage.getItem(USER_STORAGE);
   return user ? (JSON.parse(user) as UserDTO) : null;
 }
+
+export async function removeUserStorage() {  
+  await AsyncStorage.removeItem(USER_STORAGE);
+}

@@ -10,6 +10,7 @@ export type AuthContextDataProps = {
     user: UserDTO;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    updateUserProfile: (updatedUser: UserDTO) => Promise<void>;
     isLoadingUserStorageData: boolean;
 }
 
@@ -21,8 +22,8 @@ export const AuthContext = createContext<AuthContextDataProps>({} as AuthContext
 
 export function AuthContextProvider({children}: AuthContextProviderProps){
     const [user, setUser] = useState<UserDTO>({} as UserDTO);
+    
     const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true);
-
 
     function updateUserStateAndAPITokenHeaders(userData: UserDTO, token: string){
             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -67,6 +68,17 @@ export function AuthContextProvider({children}: AuthContextProviderProps){
         }
     }
 
+    async function updateUserProfile(updatedUser: UserDTO){
+        try {
+            setUser(updatedUser);
+            await saveUserStorage(updatedUser)
+            
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async function loadUserData(){
         try {
             setIsLoadingUserStorageData(true);
@@ -94,7 +106,8 @@ export function AuthContextProvider({children}: AuthContextProviderProps){
             user, 
             signIn,
             isLoadingUserStorageData,
-            signOut
+            signOut,
+            updateUserProfile
             }}>
             {children}
         </AuthContext.Provider>
